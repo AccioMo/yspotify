@@ -1,7 +1,6 @@
 from __future__ import unicode_literals
 from requests import get
 import yt_dlp
-from yt_dlp import YoutubeDL
 from bs4 import *
 from metadata import *
 
@@ -70,7 +69,7 @@ def executeSP(song):
 
 # Search on Youtube.
 def searchYouTube(arg):
-    with YoutubeDL(YDL_OPTIONS) as ydl:
+    with yt_dlp.YoutubeDL(YDL_OPTIONS) as ydl:
         try:
             get(arg)
         except:
@@ -82,7 +81,7 @@ def searchYouTube(arg):
     return f"https://www.youtube.com/watch?v={idSong}", titleSong
 
 def getPlaylist(playlist_url):
-    with YoutubeDL(YDL_OPTIONS) as ydl:
+    with yt_dlp.YoutubeDL(YDL_OPTIONS) as ydl:
         playlist = ydl.extract_info(url=playlist_url, download=False, process=False)
         with open("data\doc.json", "r") as l:
             vList = json.load(l)
