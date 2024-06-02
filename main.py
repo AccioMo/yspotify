@@ -1,8 +1,6 @@
-from bs4 import *
 import base64
 from data import *
 from dotenv import load_dotenv
-import os
 
 os.system('cls')
 

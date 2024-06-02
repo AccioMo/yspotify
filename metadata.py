@@ -1,7 +1,6 @@
 import os
 import json
 import shutil
-from bs4 import *
 import requests
 from lyricsgenius import Genius
 from mutagen.mp3 import MP3
