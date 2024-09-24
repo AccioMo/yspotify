@@ -2,7 +2,7 @@ import base64
 from data import *
 from dotenv import load_dotenv
 
-os.system('cls')
+# os.system('cls')
 
 url = "https://accounts.spotify.com/api/token"
 headers = {}
@@ -29,12 +29,12 @@ headers = {
 print("Type SP to switch to Spotify or PATH to change download folder.")
 while True:
 	# try:
-		query = input("Enter link to video/playlist, or search:-")
+		query = input("Enter link to video/playlist, or search: ")
 		if query.find("youtube.com") != -1:
 			if query.find("playlist") != -1: getPlaylist(query)
 			else: downloadVideo(query)
 
-		elif query.upper() == "PATH": VIDEO_PATH = input("Set a new download directory:-")
+		elif query.upper() == "PATH": VIDEO_PATH = input("Set a new download directory: ")
 
 		elif query.upper() == "SP":
 			if (not os.path.exists("data\DownloadedList.json")):
@@ -61,13 +61,15 @@ while True:
 				name = reversed_history[pid]
 				pageURL = f"https://api.spotify.com/v1/playlists/{pid}"
 				no_of_songs = countPages(headers, pageURL)
-				songs_added = no_of_songs - len(DownloadedList[pid])
+				if pid in DownloadedList:
+					songs_added = no_of_songs - len(DownloadedList[pid])
+				else: songs_added = no_of_songs
 				print(f"  {no}- {pid}: {name}, {no_of_songs} Songs (+{songs_added} Added)")
 				recent_searches.append(pid)
 				if no >= 3: break
 			
-			query = input("Input Playlist ID or choose from Recents:-")
-			if query.upper() == "PATH": MUSIC_PATH = input("Set a new download directory:-")
+			query = input("Input Playlist ID or choose from Recents:- ")
+			if query.upper() == "PATH": MUSIC_PATH = input("Set a new download directory: ")
 			try: query = int(query)
 
 			except: pass
@@ -81,7 +83,7 @@ while True:
 		
 		else:
 			url, title = searchYouTube(query)
-			n = input(f"Found: {title} -(Y/N)-")
+			n = input(f"Found: {title} - (Y/N): ")
 			if n.upper() != "N": downloadVideo(url)
 			else: pass
 		
