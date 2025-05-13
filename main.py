@@ -4,39 +4,66 @@ from dotenv import load_dotenv
 
 # os.system('cls')
 
-url = "https://accounts.spotify.com/api/token"
-headers = {}
-data = {}
+if not os.path.exists("data\config.json"):
+	with open("data\config.json", "w") as h:
+		config = {
+			"video_path": f"./Downloads/videos",
+			"audio_path": f"./Downloads/audio",
+		}
+		histo = json.dumps(config, indent=2)
+		h.write(histo)
+with open("data\config.json", "r") as h:
+	config = json.load(h)
 
-load_dotenv()
-clientID = os.environ.get("SPOTIFY_CLIENT_ID")
-clientSecret = os.environ.get("SPOTIFY_CLIENT_SECRET")
+VIDEO_PATH = config["video_path"]
+MUSIC_PATH = config["audio_path"]
 
-msgBytes = f"{clientID}:{clientSecret}".encode('ascii')
-msgBytes64 = base64.b64encode(msgBytes)
-msg64 = msgBytes64.decode('ascii')
+GREEN = "\033[92m"
+BLUE = "\033[94m"
+RESET = "\033[0m"
 
-headers['Authorization'] = f"Basic {msg64}"
-data['grant_type'] = "client_credentials"
-r = requests.post(url, headers=headers, data=data)
+video = True
 
-token = r.json()['access_token']
-
-headers = {
-	"Authorization": "Bearer " + token
-}
-
-print("Type SP to switch to Spotify or PATH to change download folder.")
+print("Type AUDIO to download audio, VIDEO to download video, or SP to download Spotify playlist.")
 while True:
 	# try:
-		query = input("Enter link to video/playlist, or search: ")
+		print(f"[ {GREEN + 'VIDEO' + RESET if video else BLUE + 'AUDIO' + RESET} ]", end="  ")
+		query = input("Enter link to video/playlist, or search youtube: ")
 		if query.find("youtube.com") != -1:
 			if query.find("playlist") != -1: getPlaylist(query)
-			else: downloadVideo(query)
+			elif video: downloadVideo(query, VIDEO_PATH)
+			else: downloadAudio(query, MUSIC_PATH)
 
-		elif query.upper() == "PATH": VIDEO_PATH = input("Set a new download directory: ")
+		elif query.upper() == "AUDIO" or query.upper() == "A":
+			video = False
+		elif query.upper() == "VIDEO" or query.upper() == "V":
+			video = True
+		
+		elif query.upper() == "VPATH": VIDEO_PATH = input("Set a new video download directory: ")
+		elif query.upper() == "APATH": MUSIC_PATH = input("Set a new audio download directory: ")
 
 		elif query.upper() == "SP":
+			url = "https://accounts.spotify.com/api/token"
+			headers = {}
+			data = {}
+
+			load_dotenv()
+			clientID = os.environ.get("SPOTIFY_CLIENT_ID")
+			clientSecret = os.environ.get("SPOTIFY_CLIENT_SECRET")
+
+			msgBytes = f"{clientID}:{clientSecret}".encode('ascii')
+			msgBytes64 = base64.b64encode(msgBytes)
+			msg64 = msgBytes64.decode('ascii')
+
+			headers['Authorization'] = f"Basic {msg64}"
+			data['grant_type'] = "client_credentials"
+			r = requests.post(url, headers=headers, data=data)
+
+			token = r.json()['access_token']
+
+			headers = {
+				"Authorization": "Bearer " + token
+			}
 			if (not os.path.exists("data\DownloadedList.json")):
 				open("data\DownloadedList.json", "w")
 			with open("data\DownloadedList.json", "r") as b:
@@ -44,8 +71,8 @@ while True:
 			if (not os.path.exists("data\History.json")):
 				with open("data\History.json", "w") as h:
 					history = {
-						"video_path": "C:\\Users\\PC\\Videos",
-						"music_path": "C:\\Users\\PC\\Music\\iTunes\\iTunes Media\\Automatically Add to iTunes",
+						"video_path": f"C:\\Users\\{os.getlogin()}\\Videos",
+						"music_path": f"C:\\Users\\{os.getlogin()}\\Music\\iTunes\\iTunes Media\\Automatically Add to iTunes",
 						"history": {}
 					}
 					histo = json.dumps(history, indent=2)

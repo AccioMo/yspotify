@@ -116,10 +116,18 @@ def downloadSong(url, outS):
 		print(ydl)
 
 # Download from YouTube.
-def downloadVideo(url):
+def downloadVideo(url, path):
 	ydl_opts = {
-		'format': 'bestvideo+bestaudio/best',
-		'outtmpl': 'videos\\%(title)s.%(ext)s'
+		'format': 'bestvideo/best',
+		'outtmpl': path + '\\%(title)s.%(ext)s'
+	}
+	with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+		ydl.download([url])
+
+def downloadAudio(url, path):
+	ydl_opts = {
+		'format': 'bestaudio/best',
+		'outtmpl': path + '\\%(title)s.%(ext)s'
 	}
 	with yt_dlp.YoutubeDL(ydl_opts) as ydl:
 		ydl.download([url])

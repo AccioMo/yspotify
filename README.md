@@ -5,11 +5,7 @@ A Windows Python script to download Spotify playlists and songs and port them ov
 
 1. Install dependencies:
 ```
-pip install requests
-pip install bs4
-pip install yt_dlp
-pip install lyricsgenius
-pip install python-dotenv
+pip install -r requirements.txt
 ```
 
 2. Create .env file and add Spotify API Client ID and Secret Key:
