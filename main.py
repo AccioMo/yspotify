@@ -4,15 +4,15 @@ from dotenv import load_dotenv
 
 # os.system('cls')
 
-if not os.path.exists("data\config.json"):
-	with open("data\config.json", "w") as h:
+if not os.path.exists("config.json"):
+	with open("config.json", "w") as h:
 		config = {
-			"video_path": f"./Downloads/videos",
-			"audio_path": f"./Downloads/audio",
+			"video_path": f"./Downloads/video/",
+			"audio_path": f"./Downloads/audio/",
 		}
 		histo = json.dumps(config, indent=2)
 		h.write(histo)
-with open("data\config.json", "r") as h:
+with open("config.json", "r") as h:
 	config = json.load(h)
 
 VIDEO_PATH = config["video_path"]
@@ -21,14 +21,16 @@ MUSIC_PATH = config["audio_path"]
 GREEN = "\033[92m"
 BLUE = "\033[94m"
 RESET = "\033[0m"
+BOLD = "\033[1m"
 
 video = True
 
 print("Type AUDIO to download audio, VIDEO to download video, or SP to download Spotify playlist.")
 while True:
-	# try:
+	try:
 		print(f"[ {GREEN + 'VIDEO' + RESET if video else BLUE + 'AUDIO' + RESET} ]", end="  ")
-		query = input("Enter link to video/playlist, or search youtube: ")
+		query = input("Enter link to video/playlist, or search youtube: " + BLUE)
+		print(RESET, end="\r")
 		if query.find("youtube.com") != -1:
 			if query.find("playlist") != -1: getPlaylist(query)
 			elif video: downloadVideo(query, VIDEO_PATH)
@@ -71,14 +73,16 @@ while True:
 			if (not os.path.exists("data\History.json")):
 				with open("data\History.json", "w") as h:
 					history = {
-						"video_path": f"C:\\Users\\{os.getlogin()}\\Videos",
-						"music_path": f"C:\\Users\\{os.getlogin()}\\Music\\iTunes\\iTunes Media\\Automatically Add to iTunes",
+						"video_path": f"./Spotify/video/",
+						"music_path": f"./Spotify/music/",
 						"history": {}
 					}
 					histo = json.dumps(history, indent=2)
 					h.write(histo)
 			with open("data\History.json", "r") as h:
 				history = json.load(h)
+			VIDEO_PATH = history["video_path"]
+			MUSIC_PATH = history["music_path"]
 			print("Recently Played:")
 			no = 0
 			recent_searches = [0]
@@ -109,9 +113,31 @@ while True:
 				getFromYouTube(query, playlist_data)
 		
 		else:
-			url, title = searchYouTube(query)
-			n = input(f"Found: {title} - (Y/N): ")
-			if n.upper() != "N": downloadVideo(url)
-			else: pass
+			video = searchYouTube(query)
+			if video:
+				title = video["title"]
+				seconds = video["duration"]
+				minutes = seconds // 60
+				hours = seconds // 3600
+				duration = f"{hours:02}:{minutes % 60:02}:{seconds % 60:02}"
+				views = video["view_count"]
+				likes = video["like_count"]
+				print("[yspotify]", BOLD + BLUE + f"{title}" + RESET)
+				print(f"[yspotify]", BOLD + BLUE + "👁 " + f"{views:,} views" + RESET)
+				print(f"[yspotify]", BOLD + BLUE + "⧖ " + f"{duration}" + RESET)
+				print(f"[yspotify]", BOLD + BLUE + "🖒 " + f"{likes:,} likes" + RESET)
+				n = input("[yspotify] Download? (y/n) " + BOLD + BLUE)
+				print(RESET, end="\r")
+				if n.upper() != "N":
+					video_id = video["id"]
+					url = f"https://www.youtube.com/watch?v={video_id}"
+					if video: downloadVideo(url, VIDEO_PATH)
+					else: downloadAudio(url, MUSIC_PATH)
+			else:
+				print("No results found.")
+				continue
 		
-	# except Exception as err: print(f"{err}")
+	except Exception as e:
+		print(f"[yspotify] Error: {e}")
+		print(RESET, end="\r")
+		continue

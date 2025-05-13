@@ -80,9 +80,7 @@ def searchYouTube(arg):
 				video = ydl.extract_info(arg, download=False)
 		else:
 			video = ydl.extract_info(arg, download=False)
-	idSong = video["id"]
-	titleSong = video["title"]
-	return f"https://www.youtube.com/watch?v={idSong}", titleSong
+	return video
 
 def getPlaylist(playlist_url):
 	with yt_dlp.YoutubeDL(YDL_OPTIONS) as ydl:
@@ -119,7 +117,7 @@ def downloadSong(url, outS):
 def downloadVideo(url, path):
 	ydl_opts = {
 		'format': 'bestvideo/best',
-		'outtmpl': path + '\\%(title)s.%(ext)s'
+		'outtmpl': path + '/%(title)s.%(ext)s'
 	}
 	with yt_dlp.YoutubeDL(ydl_opts) as ydl:
 		ydl.download([url])
@@ -127,7 +125,7 @@ def downloadVideo(url, path):
 def downloadAudio(url, path):
 	ydl_opts = {
 		'format': 'bestaudio/best',
-		'outtmpl': path + '\\%(title)s.%(ext)s'
+		'outtmpl': path + '/%(title)s.%(ext)s'
 	}
 	with yt_dlp.YoutubeDL(ydl_opts) as ydl:
 		ydl.download([url])
